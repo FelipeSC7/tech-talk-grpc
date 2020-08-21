@@ -17,6 +17,7 @@
  */
 
 var PROTO_PATH = __dirname + '/../protos/helloworld.proto';
+var PROTO_PATH_GET = __dirname + '/../protos/keyvaluestore.proto';
 
 var grpc = require('grpc');
 var protoLoader = require('@grpc/proto-loader');
@@ -30,10 +31,24 @@ var packageDefinition = protoLoader.loadSync(
     });
 var hello_proto = grpc.loadPackageDefinition(packageDefinition).helloworld;
 
+var packageDefinitionGetValues = protoLoader.loadSync(
+  PROTO_PATH_GET,
+  {keepCase: true,
+   longs: String,
+   enums: String,
+   defaults: true,
+   oneofs: true
+  });
+var get_values_proto = grpc.loadPackageDefinition(packageDefinitionGetValues).keyvaluestore;
+
 /**
  * Implements the SayHello RPC method.
  */
 function sayHello(call, callback) {
+  callback(null, {message: 'Hello ' + call.request.name});
+}
+
+function getValues(call, callback) {
   callback(null, {message: 'Hello ' + call.request.name});
 }
 
@@ -44,6 +59,7 @@ function sayHello(call, callback) {
 function main() {
   var server = new grpc.Server();
   server.addService(hello_proto.Greeter.service, {sayHello: sayHello});
+  server.addService(get_values_proto.KeyValueStore.service, {getValues: getValues});
   server.bind('0.0.0.0:50051', grpc.ServerCredentials.createInsecure());
   server.start();
 }
