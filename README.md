@@ -1,5 +1,4 @@
 gRPC in 3 minutes (Node.js)
-===========================
 
 PREREQUISITES
 -------------
